@@ -9,7 +9,7 @@ import os
 import googleapiclient.discovery
 
 
-def get_comments(video_id):
+def _get_yt_client():
     os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
 
     api_service_name = "youtube"
@@ -19,14 +19,47 @@ def get_comments(video_id):
     youtube = googleapiclient.discovery.build(
         api_service_name, api_version, developerKey=DEVELOPER_KEY
     )
+    return youtube
 
-    request = youtube.commentThreads().list(part="snippet,replies", videoId=video_id)
-    response = request.execute()
 
-    ids = [x["snippet"]["topLevelComment"]["id"] for x in response["items"]]
+YT = _get_yt_client()
+
+
+def _get_comment_threads(video_id, page_token=None):
+
+    request = YT.commentThreads().list(
+        part="snippet,replies", videoId=video_id, pageToken=page_token
+    )
+    return request.execute()
+
+
+def extract_top(resp):
+    comments = [x["snippet"]["topLevelComment"] for x in resp["items"]]
+    return [{"id": c["id"], "original": c["snippet"]["textOriginal"]} for c in comments]
+
+
+def get_comment_threads(video_id):
+    some_threads = _get_comment_threads(video_id)
+    token = some_threads["nextPageToken"]
+    result = extract_top(some_threads)
+    while token is not None:
+        more_threads = _get_comment_threads(video_id, token)
+        token = more_threads.get("nextPageToken")
+        result.extend(extract_top(more_threads))
+    return result
+
+
+def get_children(resp):
+    ids = [x["snippet"]["topLevelComment"]["id"] for x in resp["items"]]
     children = []
     for id in ids:
-        request = youtube.comments().list(part="snippet", parentId=id)
-        children.append(request.execute())
+        child = get_child_comments(id)
+        children.append(child)
 
-    return response, children
+    return children
+
+
+def get_child_comments(parent_id):
+    request = YT.comments().list(part="snippet", parentId=parent_id)
+    response = request.execute()
+    return response
