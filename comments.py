@@ -4,6 +4,7 @@
 # See instructions for running these code samples locally:
 # https://developers.google.com/explorer-help/guides/code_samples#python
 
+import json
 import os
 
 import googleapiclient.discovery
@@ -42,11 +43,20 @@ def get_comment_threads(video_id):
     some_threads = _get_comment_threads(video_id)
     token = some_threads["nextPageToken"]
     result = extract_top(some_threads)
+    page_count = 1
     while token is not None:
         more_threads = _get_comment_threads(video_id, token)
         token = more_threads.get("nextPageToken")
         result.extend(extract_top(more_threads))
+        print(f"got page {page_count}", end="\r")
+        page_count += 1
     return result
+
+
+def save(top, name, video_id):
+    fname = f"{name}-{video_id}.json"
+    with open(fname, "w") as f:
+        json.dump(top, f, indent=2)
 
 
 def get_children(resp):
