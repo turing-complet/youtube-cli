@@ -53,8 +53,10 @@ def get_comment_threads(video_id):
     return result
 
 
-def save(top, name, video_id):
-    fname = f"{name}-{video_id}.json"
+def save(top, video_id, prefix=""):
+    if prefix != "":
+        prefix = f"{prefix}_"
+    fname = f"{prefix}{video_id}.json"
     with open(fname, "w") as f:
         json.dump(top, f, indent=2)
 
