@@ -2,6 +2,7 @@ import click
 
 from .comments import get_comment_threads
 from .helpers import save as _save
+from .videos import get_video
 
 
 @click.group()
@@ -29,5 +30,17 @@ def comments(video_id, save):
         click.echo(top)
 
 
+@click.command()
+@click.option("--video-id", help="the video id")
+@click.option("--save", is_flag=True)
+def video(video_id, save):
+    details = get_video(video_id)
+    if save:
+        _save(details, video_id)
+    else:
+        click.echo(details)
+
+
 cli.add_command(comments)
+cli.add_command(video)
 cli.add_command(test)
