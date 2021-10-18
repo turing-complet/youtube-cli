@@ -1,29 +1,4 @@
-# -*- coding: utf-8 -*-
-
-# Sample Python code for youtube.commentThreads.list
-# See instructions for running these code samples locally:
-# https://developers.google.com/explorer-help/guides/code_samples#python
-
-import json
-import os
-
-import googleapiclient.discovery
-
-
-def _get_yt_client():
-    os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
-
-    api_service_name = "youtube"
-    api_version = "v3"
-    DEVELOPER_KEY = os.getenv("YOUTUBE_KEY")
-
-    youtube = googleapiclient.discovery.build(
-        api_service_name, api_version, developerKey=DEVELOPER_KEY
-    )
-    return youtube
-
-
-YT = _get_yt_client()
+from .helpers import YOUTUBE_CLIENT as YT
 
 
 def _get_comment_threads(video_id, page_token=None):
@@ -51,14 +26,6 @@ def get_comment_threads(video_id):
         print(f"got page {page_count}", end="\r")
         page_count += 1
     return result
-
-
-def save(top, video_id, prefix=""):
-    if prefix != "":
-        prefix = f"{prefix}_"
-    fname = f"{prefix}{video_id}.json"
-    with open(fname, "w") as f:
-        json.dump(top, f, indent=2)
 
 
 def get_children(resp):

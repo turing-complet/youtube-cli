@@ -1,6 +1,7 @@
 import click
 
-from comments import get_comment_threads, save as _save
+from .comments import get_comment_threads
+from .helpers import save as _save
 
 
 @click.group()
