@@ -1,4 +1,33 @@
+from dataclasses import dataclass
+
 from .helpers import YOUTUBE_CLIENT as YT
+
+
+@dataclass
+class Statistics:
+    view_count: int
+    comment_count: int
+
+    @staticmethod
+    def from_dict(stats):
+        return Statistics(
+            view_count=stats["viewCount"], comment_count=stats["commentCount"]
+        )
+
+
+@dataclass
+class Video:
+    title: str
+    statistics: Statistics
+    # content_details: dict
+
+    @staticmethod
+    def from_dict(video):
+        return Video(
+            title=video["title"],
+            statistics=Statistics.from_dict(video["statistics"]),
+            # content_details=video["contentDetails"],
+        )
 
 
 def get_video(video_id):
@@ -9,7 +38,7 @@ def get_video(video_id):
     result["title"] = body["snippet"]["title"]
     result["statistics"] = body["statistics"]
     result["contentDetails"] = body["contentDetails"]
-    return result
+    return Video.from_dict(result)
 
 
 def get_channel_videos(channel_id):
