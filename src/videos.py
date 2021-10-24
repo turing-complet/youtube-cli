@@ -11,7 +11,8 @@ class Statistics:
     @staticmethod
     def from_dict(stats):
         return Statistics(
-            view_count=stats["viewCount"], comment_count=stats["commentCount"]
+            view_count=int(stats["viewCount"]),
+            comment_count=int(stats["commentCount"]),
         )
 
 
