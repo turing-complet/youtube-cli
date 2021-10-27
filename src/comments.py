@@ -1,4 +1,30 @@
+from dataclasses import dataclass, field
+from typing import List
+
 from .helpers import YOUTUBE_CLIENT as YT
+
+
+@dataclass
+class Comment:
+    id: str
+    text: str
+
+
+@dataclass
+class TopLevelComment(Comment):
+    replies: List[Comment] = field(default_factory=list)
+
+
+@dataclass
+class CommentThread:
+    comments: List[TopLevelComment]
+
+    def extend(self, thread):
+        self.comments.extend(thread.comments)
+
+    @property
+    def size(self):
+        return sum(1 + len(c.replies) for c in self.comments)
 
 
 def _get_comment_threads(video_id, page_token=None):
@@ -9,17 +35,26 @@ def _get_comment_threads(video_id, page_token=None):
     return request.execute()
 
 
+def _get_child_comments(parent_id):
+    request = YT.comments().list(part="snippet", parentId=parent_id)
+    response = request.execute()
+    return response
+
+
 def extract_top(resp):
     comments = [x["snippet"]["topLevelComment"] for x in resp["items"]]
-    return [{"id": c["id"], "original": c["snippet"]["textOriginal"]} for c in comments]
+    top = [TopLevelComment(c["id"], c["snippet"]["textOriginal"]) for c in comments]
+    return CommentThread(top)
 
 
-def get_comment_threads(video_id):
+def get_comment_threads(video_id, limit=None):
     some_threads = _get_comment_threads(video_id)
     token = some_threads["nextPageToken"]
     result = extract_top(some_threads)
     page_count = 1
     while token is not None:
+        if limit is not None and result.size >= limit:
+            break
         more_threads = _get_comment_threads(video_id, token)
         token = more_threads.get("nextPageToken")
         result.extend(extract_top(more_threads))
@@ -32,13 +67,7 @@ def get_children(resp):
     ids = [x["snippet"]["topLevelComment"]["id"] for x in resp["items"]]
     children = []
     for id in ids:
-        child = get_child_comments(id)
+        child = _get_child_comments(id)
         children.append(child)
 
     return children
-
-
-def get_child_comments(parent_id):
-    request = YT.comments().list(part="snippet", parentId=parent_id)
-    response = request.execute()
-    return response
