@@ -23,10 +23,11 @@ def test(ctx, video_id):
 @click.option("--video-id", help="the video id")
 @click.option("--url", help="video url")
 @click.option("--limit", type=int, help="approximate max comments")
+@click.option("--replies", is_flag=True)
 @click.option("--save", is_flag=True)
-def comments(video_id, url, limit, save):
+def comments(video_id, url, limit, replies, save):
     video_id = extract_video_id(url, video_id)
-    top = get_comment_threads(video_id, limit)
+    top = get_comment_threads(video_id, replies, limit)
     if save:
         _save(top, video_id)
     else:

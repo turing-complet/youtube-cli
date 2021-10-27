@@ -47,7 +47,7 @@ def extract_top(resp):
     return CommentThread(top)
 
 
-def get_comment_threads(video_id, limit=None):
+def get_comment_threads(video_id, replies=True, limit=None):
     some_threads = _get_comment_threads(video_id)
     token = some_threads["nextPageToken"]
     result = extract_top(some_threads)
@@ -57,17 +57,18 @@ def get_comment_threads(video_id, limit=None):
             break
         more_threads = _get_comment_threads(video_id, token)
         token = more_threads.get("nextPageToken")
-        result.extend(extract_top(more_threads))
+        thread = extract_top(more_threads)
+        if replies:
+            get_children(thread)
+        result.extend(thread)
         print(f"got page {page_count}", end="\r")
         page_count += 1
     return result
 
+def extract_children(resp):
+    return [TopLevelComment(c["id"], c["snippet"]["textOriginal"]) for c in resp["items"]]
 
-def get_children(resp):
-    ids = [x["snippet"]["topLevelComment"]["id"] for x in resp["items"]]
-    children = []
-    for id in ids:
-        child = _get_child_comments(id)
-        children.append(child)
-
-    return children
+def get_children(thread):
+    for c in thread.comments:
+        replies = _get_child_comments(c.id)
+        c.replies.append(extract_children(replies))
