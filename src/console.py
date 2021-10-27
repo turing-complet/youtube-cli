@@ -23,8 +23,8 @@ def test(ctx, video_id):
 @click.option("--video-id", help="the video id")
 @click.option("--url", help="video url")
 @click.option("--limit", type=int, help="approximate max comments")
-@click.option("--replies", is_flag=True)
-@click.option("--save", is_flag=True)
+@click.option("--replies", is_flag=True, help="include comment replies")
+@click.option("--save", is_flag=True, help="save to file (default is stdout)")
 def comments(video_id, url, limit, replies, save):
     video_id = extract_video_id(url, video_id)
     top = get_comment_threads(video_id, replies, limit)
@@ -37,7 +37,7 @@ def comments(video_id, url, limit, replies, save):
 @cli.command()
 @click.option("--video-id", help="the video id")
 @click.option("--url", help="video url")
-@click.option("--save", is_flag=True)
+@click.option("--save", is_flag=True, help="save to file (default is stdout)")
 def video(video_id, url, save):
     video_id = extract_video_id(url, video_id)
     details = get_video(video_id)

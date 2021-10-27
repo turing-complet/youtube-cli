@@ -8,12 +8,37 @@ source .env/bin/activate
 pip install -e .
 ```
 
-Cli usage:
+Example usage:
 ```bash
 yt-cli --help
-yt-cli comments --help
 yt-cli comments --video-id W86cTIoMv2U --save
 yt-cli video --url https://www.youtube.com/watch?v=B-eeNvUEGDk
+```
+
+```
+> yt-cli comments --help
+
+Usage: yt-cli comments [OPTIONS]
+
+Options:
+  --video-id TEXT  the video id
+  --url TEXT       video url
+  --limit INTEGER  approximate max comments
+  --replies        include comment replies
+  --save           save to file (default is stdout)
+  --help           Show this message and exit.
+```
+
+```
+> yt-cli video --help
+
+Usage: yt-cli video [OPTIONS]
+
+Options:
+  --video-id TEXT  the video id
+  --url TEXT       video url
+  --save           save to file (default is stdout)
+  --help           Show this message and exit.
 ```
 
 Interactive:
