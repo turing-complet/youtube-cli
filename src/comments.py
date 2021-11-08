@@ -1,4 +1,4 @@
-from dataclasses import dataclass, field, asdict
+from dataclasses import dataclass, field
 import json
 from typing import List
 
@@ -74,7 +74,7 @@ def get_comment_threads(video_id, replies=True, limit=None):
         result.extend(thread)
         print(f"got page {page_count}", end="\r")
         page_count += 1
-    return asdict(result)
+    return result
 
 
 def extract_children(resp):

@@ -1,4 +1,4 @@
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass
 
 from .helpers import YOUTUBE_CLIENT as YT
 
@@ -45,9 +45,4 @@ def get_video(video_id):
     result["title"] = body["snippet"]["title"]
     result["statistics"] = body["statistics"]
     result["contentDetails"] = body["contentDetails"]
-    vid = Video.from_dict(result)
-    return asdict(vid)
-
-
-def get_channel_videos(channel_id):
-    pass
+    return Video.from_dict(result)

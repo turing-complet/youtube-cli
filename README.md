@@ -41,6 +41,18 @@ Options:
   --help           Show this message and exit.
 ```
 
+Get information about a channel:
+```
+> yt-cli channel info --username [USERNAME]
+> yt-cli channel info --channel-id [CHANNEL_ID]
+```
+
+Get uploads from a channel:
+```
+> yt-cli channel uploads --username [USERNAME] --limit 100
+> yt-cli channel uploads --channel-id [CHANNEL_ID]
+```
+
 Interactive:
 ```python
 from src.comments import *
@@ -52,7 +64,6 @@ save(top, smallest_cat, prefix="cat")
 ```
 
 TODO
-* sort channel vids by popularity
 * get comment count from video api, show progress bar
 * list videos i've listened to the most
 * get bigger batches

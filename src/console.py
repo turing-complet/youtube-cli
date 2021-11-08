@@ -1,8 +1,11 @@
+from dataclasses import asdict
+
 import click
 
 from .channel import get_channel_info
 from .comments import get_comment_threads
 from .helpers import save as _save, extract_video_id
+from .playlist import get_playlist
 from .videos import get_video
 
 
@@ -29,6 +32,7 @@ def test(ctx, video_id):
 def comments(video_id, url, limit, replies, save):
     video_id = extract_video_id(url, video_id)
     top = get_comment_threads(video_id, replies, limit)
+    top = asdict(top)
     if save:
         _save(top, video_id)
     else:
@@ -42,15 +46,33 @@ def comments(video_id, url, limit, replies, save):
 def video(video_id, url, save):
     video_id = extract_video_id(url, video_id)
     details = get_video(video_id)
+    details = asdict(details)
     if save:
         _save(details, video_id)
     else:
         click.echo(details)
 
 
-@cli.command()
+@cli.group()
+def channel():
+    pass
+
+
+@channel.command()
 @click.option("--channel-id", help="channel id")
 @click.option("--username", help="channel username")
-def channel(channel_id, username):
+def info(channel_id, username):
     channel_info = get_channel_info(channel_id, username)
+    channel_info = asdict(channel_info)
     click.echo(channel_info)
+
+
+@channel.command()
+@click.option("--channel-id", help="channel id")
+@click.option("--username", help="channel username")
+@click.option("--limit", help="max results")
+def uploads(channel_id, username, limit):
+    channel_info = get_channel_info(channel_id, username)
+    uploads_id = channel_info.playlists["uploads"]
+    videos = get_playlist(uploads_id, max_results=limit)
+    click.echo([asdict(v) for v in videos])

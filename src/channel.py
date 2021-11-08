@@ -1,4 +1,4 @@
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass
 from typing import Dict
 
 from .helpers import YOUTUBE_CLIENT as YT
@@ -40,5 +40,4 @@ def get_channel_info(channel_id=None, username=None):
         raise ValueError("Must supply either channel_id or username")
 
     resp = req.execute()
-    channel_info = ChannelInfo.from_dict(resp)
-    return asdict(channel_info)
+    return ChannelInfo.from_dict(resp)
