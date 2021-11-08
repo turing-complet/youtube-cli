@@ -18,6 +18,7 @@ class Statistics:
 
 @dataclass
 class Video:
+    video_id: str
     title: str
     statistics: Statistics
     # content_details: dict
@@ -25,10 +26,14 @@ class Video:
     @staticmethod
     def from_dict(video):
         return Video(
+            video_id=video["video_id"],
             title=video["title"],
             statistics=Statistics.from_dict(video["statistics"]),
             # content_details=video["contentDetails"],
         )
+
+    def video_url(self):
+        return f"https://www.youtube.com/watch?v={self.video_id}"
 
 
 def get_video(video_id):
@@ -36,6 +41,7 @@ def get_video(video_id):
     resp = req.execute()
     result = {}
     body = resp["items"][0]
+    result["video_id"] = body["id"]
     result["title"] = body["snippet"]["title"]
     result["statistics"] = body["statistics"]
     result["contentDetails"] = body["contentDetails"]
