@@ -1,5 +1,6 @@
 import click
 
+from .channel import get_channel_info
 from .comments import get_comment_threads
 from .helpers import save as _save, extract_video_id
 from .videos import get_video
@@ -45,3 +46,11 @@ def video(video_id, url, save):
         _save(details, video_id)
     else:
         click.echo(details)
+
+
+@cli.command()
+@click.option("--channel-id", help="channel id")
+@click.option("--username", help="channel username")
+def channel(channel_id, username):
+    channel_info = get_channel_info(channel_id, username)
+    click.echo(channel_info)

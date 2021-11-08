@@ -1,4 +1,5 @@
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, asdict
+import json
 from typing import List
 
 from .helpers import YOUTUBE_CLIENT as YT
@@ -41,6 +42,16 @@ def _get_child_comments(parent_id):
     return response
 
 
+def extract_text(filename, rename=None):
+    with open(filename) as f:
+        orig = json.load(f)
+        filtered = [c["text"] for c in orig["comments"]]
+    if rename is not None:
+        filename = rename
+    with open(filename, "w") as f:
+        json.dump(filtered, f, indent=2)
+
+
 def extract_top(resp):
     comments = [x["snippet"]["topLevelComment"] for x in resp["items"]]
     top = [TopLevelComment(c["id"], c["snippet"]["textOriginal"]) for c in comments]
@@ -49,7 +60,7 @@ def extract_top(resp):
 
 def get_comment_threads(video_id, replies=True, limit=None):
     some_threads = _get_comment_threads(video_id)
-    token = some_threads["nextPageToken"]
+    token = some_threads.get("nextPageToken")
     result = extract_top(some_threads)
     page_count = 1
     while token is not None:
@@ -63,10 +74,14 @@ def get_comment_threads(video_id, replies=True, limit=None):
         result.extend(thread)
         print(f"got page {page_count}", end="\r")
         page_count += 1
-    return result
+    return asdict(result)
+
 
 def extract_children(resp):
-    return [TopLevelComment(c["id"], c["snippet"]["textOriginal"]) for c in resp["items"]]
+    return [
+        TopLevelComment(c["id"], c["snippet"]["textOriginal"]) for c in resp["items"]
+    ]
+
 
 def get_children(thread):
     for c in thread.comments:

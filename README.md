@@ -54,3 +54,5 @@ save(top, smallest_cat, prefix="cat")
 TODO
 * sort channel vids by popularity
 * get comment count from video api, show progress bar
+* list videos i've listened to the most
+* get bigger batches
