@@ -1,4 +1,5 @@
 from dataclasses import asdict
+import json
 
 import click
 
@@ -7,6 +8,10 @@ from .comments import get_comment_threads
 from .helpers import save as _save, extract_video_id
 from .playlist import get_playlist
 from .videos import get_video
+
+
+def _echo_json(text):
+    click.echo(json.dumps(text, indent=2))
 
 
 @click.group()
@@ -36,7 +41,7 @@ def comments(video_id, url, limit, replies, save):
     if save:
         _save(top, video_id)
     else:
-        click.echo(top)
+        _echo_json(top)
 
 
 @cli.command()
@@ -50,7 +55,7 @@ def video(video_id, url, save):
     if save:
         _save(details, video_id)
     else:
-        click.echo(details)
+        _echo_json(details)
 
 
 @cli.group()
@@ -64,7 +69,7 @@ def channel():
 def info(channel_id, username):
     channel_info = get_channel_info(channel_id, username)
     channel_info = asdict(channel_info)
-    click.echo(channel_info)
+    _echo_json(channel_info)
 
 
 @channel.command()
@@ -75,4 +80,4 @@ def uploads(channel_id, username, limit):
     channel_info = get_channel_info(channel_id, username)
     uploads_id = channel_info.playlists["uploads"]
     videos = get_playlist(uploads_id, max_results=limit)
-    click.echo([asdict(v) for v in videos])
+    _echo_json([asdict(v) for v in videos])
