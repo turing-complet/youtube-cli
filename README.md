@@ -67,3 +67,5 @@ TODO
 * get comment count from video api, show progress bar
 * list videos i've listened to the most
 * get bigger batches
+* add username to ChannelInfo
+* why is uploads playlist incomplete
