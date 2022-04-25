@@ -28,18 +28,25 @@ class CommentThread:
         return sum(1 + len(c.replies) for c in self.comments)
 
 
-def _get_comment_threads(video_id, page_token=None):
+def get_threads(video_id, page_token=None):
 
     request = YT.commentThreads().list(
-        part="snippet,replies", videoId=video_id, pageToken=page_token
+        part="snippet,replies", videoId=video_id, pageToken=page_token, maxResults=100
     )
-    return request.execute()
+    try:
+        return request.execute()
+    except Exception as e:
+        print(f"Failed request for thread: {e}")
+        return {}
 
 
 def _get_child_comments(parent_id):
-    request = YT.comments().list(part="snippet", parentId=parent_id)
-    response = request.execute()
-    return response
+    request = YT.comments().list(part="snippet", parentId=parent_id, maxResults=100)
+    try:
+        return request.execute()
+    except Exception as e:
+        print(f"Failed request for replies: {e}")
+        return {}
 
 
 def extract_text(filename, rename=None):
@@ -53,20 +60,20 @@ def extract_text(filename, rename=None):
 
 
 def extract_top(resp):
-    comments = [x["snippet"]["topLevelComment"] for x in resp["items"]]
+    comments = [x["snippet"]["topLevelComment"] for x in resp.get("items", [])]
     top = [TopLevelComment(c["id"], c["snippet"]["textOriginal"]) for c in comments]
     return CommentThread(top)
 
 
 def get_comment_threads(video_id, replies=True, limit=None):
-    some_threads = _get_comment_threads(video_id)
+    some_threads = get_threads(video_id)
     token = some_threads.get("nextPageToken")
     result = extract_top(some_threads)
     page_count = 1
     while token is not None:
         if limit is not None and result.size >= limit:
             break
-        more_threads = _get_comment_threads(video_id, token)
+        more_threads = get_threads(video_id, token)
         token = more_threads.get("nextPageToken")
         thread = extract_top(more_threads)
         if replies:
@@ -79,7 +86,8 @@ def get_comment_threads(video_id, replies=True, limit=None):
 
 def extract_children(resp):
     return [
-        TopLevelComment(c["id"], c["snippet"]["textOriginal"]) for c in resp["items"]
+        TopLevelComment(c["id"], c["snippet"]["textOriginal"])
+        for c in resp.get("items", [])
     ]
 
 

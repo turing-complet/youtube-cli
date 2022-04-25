@@ -69,3 +69,4 @@ TODO
 * get bigger batches
 * add username to ChannelInfo
 * why is uploads playlist incomplete
+* collect partial results if quota exceeded, or other exception
