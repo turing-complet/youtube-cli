@@ -11,7 +11,7 @@ from .videos import get_video
 
 
 def _echo_json(text):
-    click.echo(json.dumps(text, indent=2))
+    click.echo(json.dumps(text, indent=2, ensure_ascii=False))
 
 
 @click.group()

@@ -56,7 +56,7 @@ def extract_text(filename, rename=None):
     if rename is not None:
         filename = rename
     with open(filename, "w") as f:
-        json.dump(filtered, f, indent=2)
+        json.dump(filtered, f, indent=2, ensure_ascii=False)
 
 
 def extract_top(resp):

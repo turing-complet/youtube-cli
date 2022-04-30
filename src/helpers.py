@@ -10,7 +10,7 @@ def save(top, video_id, prefix=""):
         prefix = f"{prefix}_"
     fname = f"{prefix}{video_id}.json"
     with open(fname, "w") as f:
-        json.dump(top, f, indent=2)
+        json.dump(top, f, ensure_ascii=False, indent=2)
 
 
 def extract_video_id(url=None, video_id=None):
